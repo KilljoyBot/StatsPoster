@@ -14,7 +14,7 @@ on:
     
 
 jobs:
-  test:
+  compile:
     runs-on: ubuntu-latest
 
     steps:
