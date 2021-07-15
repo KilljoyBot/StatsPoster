@@ -72,7 +72,7 @@ const postStatsForWebsite = async (website: WebsiteCredentials, botID: string, t
     return response.status
 }
 
-const init = async () => {
+(async () => {
     const credentialsPath = getCredentialsPath()
     const credentials: Credentials = JSON.parse(Deno.readTextFileSync(credentialsPath))
 
@@ -120,6 +120,4 @@ const init = async () => {
     })
     
     console.info(message)
-}
-
-init().then(() => console.info("🙌 Success!"))
+})()
