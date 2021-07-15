@@ -54,7 +54,7 @@ export const buildBodyKey = (website: WebsiteCredentials): string => {
  * @param totalGuilds The total number of Discord Guilds (servers) to post
  * @returns The status code from the request
  */
-export const postStatsForWebsite = async (website: WebsiteCredentials, botID: string, totalGuilds: number): Promise<number> => {
+export const postStatsForWebsite = async (website: WebsiteCredentials, botID: string, totalGuilds: number): Promise<{status: number, statusText: string}> => {
 
     const body = {
         [buildBodyKey(website)]: totalGuilds
@@ -71,5 +71,8 @@ export const postStatsForWebsite = async (website: WebsiteCredentials, botID: st
         }
     )
 
-    return response.status
+    return {
+        status: response.status,
+        statusText: response.statusText
+    }
 }

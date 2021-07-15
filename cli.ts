@@ -48,7 +48,7 @@ import { getCredentialsPath, port, postStatsForWebsite } from "./utils.ts";
 
     for (const website of credentials.websites) {
         const resultStatus = await postStatsForWebsite(website, botID, totalGuilds)
-        message += `\n - ${website.name}: ${resultStatus}`
+        message += `\n - ${website.name}: [${resultStatus.status}] ${resultStatus.statusText}`
     }
     
     console.info(message)
