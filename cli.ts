@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --allow-net --allow-env
+#!/usr/bin/env -S deno run --allow-read and --allow-net
 import { Client } from "./deps.ts";
 import { Credentials, ShardStats } from "./interfaces.ts";
 import { getCredentialsPath, port, postStatsForWebsite } from "./utils.ts";
