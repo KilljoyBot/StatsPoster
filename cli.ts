@@ -1,7 +1,10 @@
 #!/usr/bin/env -S deno run --allow-read and --allow-net
 import { Client } from "./deps.ts";
 import { Credentials, ShardStats } from "./interfaces.ts";
-import { getCredentialsPath, port, postStatsForWebsite } from "./utils.ts";
+import { error, GuildCount } from "./mod.ts";
+import { getCredentialsPath, postStatsForWebsite } from "./utils.ts";
+import { getPgsqlShardStats } from "./pgsql.ts";
+import { getRedisShardStats } from "./redis.ts";
 
 /**
  * Initial function for the CLI.
@@ -16,38 +19,27 @@ import { getCredentialsPath, port, postStatsForWebsite } from "./utils.ts";
 
     const botID = credentials.botID
 
-    if (!botID) throw new Error(`botID value was not found on credentials file ${credentialsPath}`)
-    if (!credentials.websites || credentials.websites.length <= 0) throw new Error(`Websites array was not found on credentials file ${credentialsPath}`)
+    if (!botID) error(`botID value was not found on credentials file ${credentialsPath}`)
+    if (!credentials.websites || credentials.websites.length <= 0) error(`Websites array was not found on credentials file ${credentialsPath}`)
 
-    const client = new Client({
-        hostname: credentials.database.host,
-        port: port(credentials.database.port),
-        user: credentials.database.username,
-        password: credentials.database.password,
-        database: credentials.database.name
-    })
+    if (!credentials.postgres && !credentials.redis) error("Must provide postgresql or redis credentials... exiting.")
 
-    console.info("⏳ Connecting with the database...")
-    try {
-        await client.connect()
-        console.info("✅ Successfully connected with the database!")
-    } catch(e) {
-        console.error(`❌ Error connecting with database ${credentials.database.host}:${port(credentials.database.port)}`)
-        throw e
+    let count: GuildCount
+
+    if (credentials.postgres) {
+        count = await getPgsqlShardStats(credentials.postgres)
+    } else if (credentials.redis) {
+        count = await getRedisShardStats(credentials.redis)
+    } else {
+        throw new Error("Exception 1")
     }
 
-    const shardStats = (await client.queryObject<ShardStats>("SELECT guild_count FROM shard_stats")).rows;
-
-    const totalGuilds = shardStats.map(s => s.guild_count).reduce((a, b) => a + b)
-
-    console.info(`The following stats will be posted:\n - Total Guilds: ${totalGuilds}`)
-
-    await client.end()
+    console.info(`The following stats will be posted:\n - Total Guilds: ${count.guilds}\n - Shards count: ${count.shards}`)
 
     let message = "Results for stats posting:"
 
     for (const website of credentials.websites) {
-        const resultStatus = await postStatsForWebsite(website, botID, totalGuilds)
+        const resultStatus = await postStatsForWebsite(website, botID, count.guilds)
         message += `\n - ${website.name}: [${resultStatus.status}] ${resultStatus.statusText}`
     }
     
