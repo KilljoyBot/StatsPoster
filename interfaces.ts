@@ -5,15 +5,25 @@ export interface WebsiteCredentials {
     body: string
 }
 
+export interface PostgresCredentials {
+    host: string
+    port?: string
+    username: string
+    password: string
+    name: string
+}
+
+export interface RedisCredentials {
+    host: string
+    port?: number
+    password?: string
+    db?: number
+}
+
 export interface Credentials {
     botID: string
-    database: {
-        host: string
-        port?: string
-        username: string
-        password: string
-        name: string
-    }
+    postgres?: PostgresCredentials
+    redis?: RedisCredentials
     websites: WebsiteCredentials[]
 }
 

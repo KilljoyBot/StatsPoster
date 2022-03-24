@@ -2,6 +2,9 @@
  
 StatsPoster is a simple Deno script for post Killjoy stats to listing services.
 
+Requires a PosgreSQL or Redis database.
+```
+
 ## Run with script installation
 1. [Install Deno](https://deno.land/#installation).
 2. Install this script ``deno install --allow-net --allow-read https://raw.githubusercontent.com/KilljoyBot/StatsPoster/main/cli.ts --name statsposter``.
@@ -22,12 +25,18 @@ StatsPoster is a simple Deno script for post Killjoy stats to listing services.
 ```js
 {
     "botID": string, 
-    "database": {
+    "postgres"?: {
         "host": string,
         "port": number,
         "username": string,
         "password": string,
         "name": string
+    },
+    "redis"?: {
+        "host": string,
+        "port": number,
+        "password": string | undefined,
+        "db": number | undefined
     },
     "websites": [
         {
